@@ -1,0 +1,45 @@
+
+name: React Docker CI/CD to Surge
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout GitHub repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Build Docker image
+      - name: Build React Docker Image
+        run: |
+          docker build -t react-surge-app .
+
+      # Step 3: Create temporary container
+      - name: Create Docker Container
+        run: |
+          docker create --name react-build react-surge-app
+
+      # Step 4: Extract React production files
+      - name: Extract Build Files
+        run: |
+          docker cp react-build:/app/dist ./dist
+
+      # Step 5: Remove temporary container
+      - name: Remove Docker Container
+        run: |
+          docker rm react-build
+
+      # Step 6: Deploy to Surge
+      - name: Deploy to Surge
+        run: |
+          npx --yes surge ./dist ${{ secrets.SURGE_DOMAIN }}
+        env:
+          SURGE_TOKEN: ${{ secrets.SURGE_TOKEN }}
