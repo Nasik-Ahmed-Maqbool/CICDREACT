@@ -20,7 +20,7 @@ jobs:
       # Step 2: Build Docker image
       - name: Build React Docker Image
         run: |
-          docker build -t react-surge-app .
+          docker build -t react-surge-app ./reactapp
 
       # Step 3: Create temporary container
       - name: Create Docker Container
